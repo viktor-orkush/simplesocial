@@ -1,9 +1,10 @@
 from django.db import IntegrityError
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 
 # Create your views here.
 from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin
 from django.contrib import messages
+from django.urls import reverse
 
 from django.views import generic
 
@@ -23,15 +24,15 @@ class ListGroups(generic.ListView):
 class JoinGroup(LoginRequiredMixin,generic.RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
-        return reversed('group:simple', kwargs={'simple':self.kwargs.get('slug')})
+        return reverse('groups:single', kwargs={'slug':self.kwargs.get('slug')})
 
     def get(self, request, *args, **kwargs):
-        group = get_object_or_400(Group, slug=self.kwargs.get('slug'))
+        group = get_object_or_404(Group, slug=self.kwargs.get('slug'))
 
         try:
             GroupMember.objects.create(user=self.request.user, group=group)
         except IntegrityError:
-            messages.warning(self.request, 'Warning already amember!')
+            messages.warning(self.request, 'Warning already member!')
         else:
             messages.warning(self.request, 'You are now a member!')
 
@@ -39,7 +40,7 @@ class JoinGroup(LoginRequiredMixin,generic.RedirectView):
 
 class LeaveGroup(LoginRequiredMixin, generic.RedirectView):
     def get_redirect_url(self, *args, **kwargs):
-        return reversed('group:simple', kwargs={'simple':self.kwargs.get('slug')})
+        return reverse('groups:single', kwargs={'slug':self.kwargs.get('slug')})
 
     def get(self, request, *args, **kwargs):
 

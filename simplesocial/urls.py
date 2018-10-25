@@ -22,6 +22,8 @@ from simplesocial import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('posts/', include('posts.urls')),
+    path('groups/', include('groups.urls')),
     path(r'', views.HomeView.as_view(), name='home'),
     url(r'^accounts/', include('accounts.urls', namespace='accounts')),
     url(r'^accounts/', include('django.contrib.auth.urls')),
